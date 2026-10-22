@@ -25,6 +25,13 @@ pnpm scrape --ai-dry                        # jak dry-run + ocena AI 3 najlepszy
 `.github/workflows/scrape.yml` uruchamia scraper co godzinę. W repo dodaj sekrety `DATABASE_URL` i `ANTHROPIC_API_KEY`.
 Na Black Week (23-30.11) zmień cron na `*/15 * * * *`. Repo publiczne ma nielimitowane minuty Actions.
 
+## Sklepy blokujące GitHuba (zadanie lokalne)
+
+Część sklepów (x-kom, Komputronik) zwraca 403 dla serwerów GitHub Actions, a wpuszcza domowe IP.
+Mają w  flagę : na CI są pomijane, a zbiera je
+ uruchamiany co godzinę (o :50) przez zadanie Windows **Blacker scraper**.
+Log: . Działa tylko, gdy komputer jest włączony i jesteś zalogowany.
+
 ## Źródła
 
 Lista w `config/sources.yaml`. Adaptery: `pepper` (RSS), `xkom-hotshot`, `jsonld` (dowolna strona produktu ze schema.org),

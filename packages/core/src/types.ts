@@ -28,6 +28,8 @@ export interface SourceConfig {
   /** Big shops vs small shops, used for dashboard filters. */
   tier: 'aggregator' | 'big' | 'small';
   enabled: boolean;
+  /** Shop blocks datacenter IPs (GitHub Actions), so only the local scheduled task fetches it. */
+  localOnly: boolean;
   url?: string;
   urls?: string[];
   category?: string;

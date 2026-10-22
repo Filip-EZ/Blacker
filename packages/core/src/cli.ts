@@ -23,7 +23,8 @@ const { values } = parseArgs({
 
 const { settings, sources: all } = loadConfig(values.config);
 const wanted = values.source?.split(',');
-const sources = all.filter((s) => (wanted ? wanted.includes(s.id) : s.enabled));
+// On CI (GitHub sets CI=true) sources that block datacenter IPs are left to the local task.
+const sources = all.filter((s) => (wanted ? wanted.includes(s.id) : s.enabled && !(process.env.CI && s.localOnly)));
 if (wanted) {
   const unknown = wanted.filter((w) => !all.some((s) => s.id === w));
   if (unknown.length) throw new Error(`Nieznane źródła: ${unknown.join(', ')}`);

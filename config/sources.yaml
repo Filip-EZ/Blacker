@@ -25,10 +25,13 @@ sources:
       - https://www.pepper.pl/rss/wszystkie
 
   # --- Duże sklepy ---
+  # localOnly: sklep blokuje serwery GitHub Actions (403), więc zbiera go tylko
+  # zadanie na domowym komputerze (scripts/scrape-local.cmd). x-kom i Komputronik: sprawdzone 22.10.2026.
   - id: xkom-hotshot
     name: x-kom
     adapter: xkom-hotshot
     tier: big
+    localOnly: true
     url: https://www.x-kom.pl/goracy_strzal
 
   # al.to zwraca 403 dla bota (sprawdzone 20.10.2026), dlatego jest wyłączony.
@@ -38,8 +41,6 @@ sources:
     tier: big
     enabled: false
     url: https://www.al.to/goracy_strzal
-
-  # x-kom wpuszcza z domowego IP, ale z serwerów GitHub Actions dostaje 403 (22.10.2026).
 
   - id: morele-daily
     name: Morele
@@ -52,6 +53,7 @@ sources:
     name: Komputronik
     adapter: komputronik
     tier: big
+    localOnly: true
     urls:
       - https://www.komputronik.pl/
       - https://www.komputronik.pl/promocje/hity-miesiaca

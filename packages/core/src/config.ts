@@ -10,6 +10,7 @@ const Source = z.object({
   adapter: z.enum(Object.keys(adapters) as [string, ...string[]]),
   tier: z.enum(['aggregator', 'big', 'small']),
   enabled: z.boolean().default(true),
+  localOnly: z.boolean().default(false),
   url: z.url().optional(),
   urls: z.array(z.url()).optional(),
   category: z.string().optional(),
