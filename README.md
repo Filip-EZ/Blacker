@@ -28,9 +28,9 @@ Na Black Week (23-30.11) zmień cron na `*/15 * * * *`. Repo publiczne ma nielim
 ## Sklepy blokujące GitHuba (zadanie lokalne)
 
 Część sklepów (x-kom, Komputronik) zwraca 403 dla serwerów GitHub Actions, a wpuszcza domowe IP.
-Mają w  flagę : na CI są pomijane, a zbiera je
- uruchamiany co godzinę (o :50) przez zadanie Windows **Blacker scraper**.
-Log: . Działa tylko, gdy komputer jest włączony i jesteś zalogowany.
+Mają w `config/sources.yaml` flagę `localOnly: true`: na CI są pomijane, a zbiera je
+`scripts/scrape-local.cmd` uruchamiany co godzinę (o :50) przez zadanie Windows **Blacker scraper**.
+Log: `logs/scrape-local.log`. Działa tylko, gdy komputer jest włączony i jesteś zalogowany.
 
 ## Źródła
 
