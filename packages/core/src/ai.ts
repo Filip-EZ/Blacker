@@ -34,6 +34,30 @@ const Review = z.object({
 const Reviews = z.object({ reviews: z.array(Review) });
 export type AiReview = z.infer<typeof Review>;
 
+const fold = (s: string) => s.normalize('NFC').toLocaleLowerCase('pl').trim();
+
+/** Maps an off-list category (other case, stray whitespace, invented name) onto the fixed list, falling back to "Inne". */
+export function normalizeCategory(raw: unknown): AiReview['category'] {
+  const key = typeof raw === 'string' ? fold(raw) : '';
+  return CATEGORIES.find((c) => fold(c) === key) ?? 'Inne';
+}
+
+/** Validates reviews one by one, so a single malformed entry does not discard the whole batch. */
+export function parseReviews(text: string): AiReview[] {
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return [];
+  }
+  const items = (data as { reviews?: unknown })?.reviews;
+  if (!Array.isArray(items)) return [];
+  return items.flatMap((item) => {
+    const r = Review.safeParse({ ...(item as object), category: normalizeCategory((item as { category?: unknown })?.category) });
+    return r.success ? [r.data] : [];
+  });
+}
+
 export interface Candidate {
   id: number;
   title: string;
@@ -71,7 +95,8 @@ export function createAiClient() {
 
 /** Reviews one batch. Returns verdicts keyed by deal id; ids the model skipped are simply missing. */
 export async function reviewBatch(client: Anthropic, batch: Candidate[]): Promise<{ reviews: Map<number, AiReview>; usage: Anthropic.Usage }> {
-  const response = await client.messages.parse({
+  // create() instead of parse(): the schema still constrains the output, but we validate leniently ourselves.
+  const response = await client.messages.create({
     model: AI_MODEL,
     max_tokens: 8000,
     system: SYSTEM,
@@ -79,8 +104,9 @@ export async function reviewBatch(client: Anthropic, batch: Candidate[]): Promis
     output_config: { effort: 'low', format: zodOutputFormat(Reviews) },
   });
   if (response.stop_reason === 'refusal') throw new Error(`AI odmówiło oceny paczki (${response.stop_details?.category ?? 'brak kategorii'})`);
+  const text = response.content.flatMap((b) => (b.type === 'text' ? [b.text] : [])).join('');
   const ids = new Set(batch.map((c) => c.id));
-  const reviews = new Map((response.parsed_output?.reviews ?? []).filter((r) => ids.has(r.id)).map((r) => [r.id, r]));
+  const reviews = new Map(parseReviews(text).filter((r) => ids.has(r.id)).map((r) => [r.id, r]));
   return { reviews, usage: response.usage };
 }
 

@@ -7,7 +7,7 @@ import { createDb } from './db';
 import { run } from './run';
 
 const root = (p: string) => fileURLToPath(new URL(`../../../${p}`, import.meta.url));
-loadEnv({ path: root('.env'), quiet: true });
+loadEnv({ path: [root('.env.local'), root('.env')], quiet: true });
 
 const { values } = parseArgs({
   options: {
