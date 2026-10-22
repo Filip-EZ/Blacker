@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { parseEmpikList } from '../src/adapters/empik';
 import { parseJsonLdProduct } from '../src/adapters/jsonld';
+import { parseKomputronik } from '../src/adapters/komputronik';
+import { parseMoreleDaily } from '../src/adapters/morele';
 import { parsePepperRss } from '../src/adapters/pepper';
 import { parseShopifyProducts } from '../src/adapters/shopify';
 import { parseWooProducts } from '../src/adapters/woocommerce';
@@ -95,5 +98,52 @@ describe('robots.txt', () => {
     expect(rules.allows('/koszyk/1')).toBe(false);
     expect(rules.allows('/koszyk/info')).toBe(true);
     expect(rules.allows('/g/laptopy?sort=price')).toBe(false);
+  });
+});
+
+describe('duże sklepy', () => {
+  it('Morele: okazja dnia z ceną z kodem, ceną bez kodu i Omnibusem', () => {
+    const [offer, ...rest] = parseMoreleDaily(fixture('morele-home.html'), 'Morele');
+    expect(rest).toHaveLength(0);
+    expect(offer).toMatchObject({
+      url: 'https://www.morele.net/lego-art-claude-monet-most-nad-stawem-z-liliami-wodnymi-31220-15924254/',
+      shopDomain: 'morele.net',
+      title: 'LEGO ART Claude Monet — Most nad stawem z liliami wodnymi (kod PROMO26)',
+      price: 599,
+      regularPrice: 658.9,
+      omnibusLow30d: 609,
+      inStock: true,
+    });
+  });
+
+  it('Komputronik: okazja dnia i karty promocyjne, bez kart bez promocji', () => {
+    const offers = parseKomputronik(fixture('komputronik-promo.html'), 'https://www.komputronik.pl', 'Komputronik');
+    expect(offers[0]).toMatchObject({
+      url: 'https://www.komputronik.pl/product/1021740/telefon-xiaomi-redmi-17-4-128gb-czarny.html',
+      title: 'Xiaomi Redmi 17 4/128GB Czarny',
+      price: 679,
+      regularPrice: 789,
+      omnibusLow30d: 789,
+      inStock: true,
+      category: 'Smartfony',
+    });
+    expect(offers.find((o) => o.title === 'Reolink Argus Series B350')).toMatchObject({ price: 339, regularPrice: 539, omnibusLow30d: 539 });
+    expect(offers.every((o) => o.omnibusLow30d != null)).toBe(true);
+    expect(new Set(offers.map((o) => o.url)).size).toBe(offers.length);
+  });
+
+  it('Empik: cena z mikrodanych, Omnibus, kategoria i sprzedawca z marketplace', () => {
+    const offers = parseEmpikList(fixture('empik-okazje.html'), 'https://www.empik.com', 'Empik');
+    expect(offers).toHaveLength(3);
+    expect(offers[0]).toMatchObject({
+      url: 'https://www.empik.com/substancja-witkowski-michal,p1756864935,ksiazka-p',
+      title: 'Substancja – Witkowski Michał',
+      price: 36.05,
+      regularPrice: 42.99,
+      omnibusLow30d: 37.95,
+      category: 'Książki',
+    });
+    expect(offers[1].title).toContain('(sprzedawca: briXani_Sklep_Stacjonarny_Wrocław)');
+    expect(offers[2]).toMatchObject({ regularPrice: undefined, omnibusLow30d: undefined });
   });
 });

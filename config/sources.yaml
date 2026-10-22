@@ -1,5 +1,5 @@
 # Źródła promocji dla Blackera.
-# adapter: pepper | xkom-hotshot | jsonld | shopify | woocommerce
+# adapter: pepper | xkom-hotshot | morele-daily | komputronik | empik | jsonld | shopify | woocommerce
 # tier:    aggregator | big | small   (filtr na dashboardzie)
 # Nowy mały sklep na Shopify/WooCommerce = jeden wpis z url sklepu.
 
@@ -39,8 +39,35 @@ sources:
     enabled: false
     url: https://www.al.to/goracy_strzal
 
-  # Media Expert zwraca 403 dla botów (sprawdzone 20.10.2026), więc go pomijamy;
-  # jego oferty i tak trafiają na Pepper.
+  # x-kom wpuszcza z domowego IP, ale z serwerów GitHub Actions dostaje 403 (22.10.2026).
+
+  - id: morele-daily
+    name: Morele
+    adapter: morele-daily
+    tier: big
+    url: https://www.morele.net/
+
+  # /promotions zwraca 403, więc bierzemy okazję dnia ze strony głównej i "Hity miesiąca".
+  - id: komputronik
+    name: Komputronik
+    adapter: komputronik
+    tier: big
+    urls:
+      - https://www.komputronik.pl/
+      - https://www.komputronik.pl/promocje/hity-miesiaca
+
+  - id: empik
+    name: Empik
+    adapter: empik
+    tier: big
+    urls:
+      - https://www.empik.com/okazje/produkty
+      - https://www.empik.com/black-friday
+
+  # Pominięte (sprawdzone 22.10.2026), ich oferty i tak trafiają na Pepper:
+  # - Media Expert: 403 dla botów.
+  # - RTV Euro AGD: strony promocji 403, a produkty na stronie głównej ładuje dopiero JavaScript.
+  # - Ceneo: przekierowuje na captchę.
 
   # --- Mniejsze sklepy (przykłady do uzupełnienia) ---
   # - id: moj-sklep-shopify
