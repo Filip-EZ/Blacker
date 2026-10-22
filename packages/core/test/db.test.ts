@@ -11,8 +11,11 @@ describe('extractDbUrl', () => {
     expect(extractDbUrl(`DATABASE_URL="${URL}"`)).toBe(URL);
     expect(extractDbUrl(`psql '${URL}'`)).toBe(URL);
   });
-  it('bez adresu rzuca błąd, który nie zdradza wartości', () => {
-    expect(() => extractDbUrl('npg_tajnehaslo')).toThrow(/długość 14, początek "\*\*\*_…"/);
-    expect(() => extractDbUrl('npg_tajnehaslo')).not.toThrow(/tajne/);
+  it('bez adresu rzuca błąd, który pokazuje układ, ale nie wartość', () => {
+    expect(() => extractDbUrl('npg_tajne')).toThrow('długość 9, "***_*****"');
+    expect(() => extractDbUrl('npg_tajne')).not.toThrow(/tajne/);
+  });
+  it('odrzuca adres, którego nie przyjąłby neon()', () => {
+    expect(() => extractDbUrl('postgresql://user:npg_x/neondb')).toThrow('"**********://****:***_*/******"');
   });
 });
