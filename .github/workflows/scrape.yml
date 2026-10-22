@@ -43,6 +43,6 @@ jobs:
           pnpm scrape \
             ${{ inputs.source && format('--source={0}', inputs.source) || '' }} \
             ${{ inputs.no_ai && '--no-ai' || '' }} 2>&1 | tee scrape.log || {
-            echo "::error title=Scrape::$(grep -v '^\s*at ' scrape.log | tail -n 15 | tr -d '\r' | sed 's/%/%25/g' | awk 'BEGIN{ORS="%0A"} {print}')"
+            echo "::error title=Scrape::$(grep -vE '^\s*at |ELIFECYCLE|ERR_PNPM|^\s*[×│]|^\s*$|^\$ ' scrape.log | tail -n 15 | tr -d '\r' | sed 's/%/%25/g' | awk 'BEGIN{ORS="%0A"} {print}')"
             exit 1
           }

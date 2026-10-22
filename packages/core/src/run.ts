@@ -2,6 +2,7 @@ import { runAiReviews } from './ai';
 import { adapters } from './adapters';
 import type { Settings } from './config';
 import type { Db } from './db';
+import { errorMessage } from './errors';
 import { BlockedError, createHttp } from './http';
 import { scoreOffer, type Score } from './scoring';
 import { expireStale, pruneRuns, recordRun, saveOffers } from './store';
@@ -40,7 +41,7 @@ export async function run({ settings, sources, db, ai, log = console.log }: RunO
       }
       if (db) await recordRun(db, { sourceId: source.id, ok: true, offers: offers.length, durationMs: Date.now() - started });
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const message = errorMessage(err);
       log(`${err instanceof BlockedError ? '⊘' : '✗'} ${source.id}: ${message}`);
       if (db) await recordRun(db, { sourceId: source.id, ok: false, error: message.slice(0, 500), durationMs: Date.now() - started });
     }

@@ -4,6 +4,7 @@ import { config as loadEnv } from 'dotenv';
 import { createAiClient, reviewBatch } from './ai';
 import { loadConfig } from './config';
 import { createDb } from './db';
+import { errorMessage } from './errors';
 import { run } from './run';
 
 const root = (p: string) => fileURLToPath(new URL(`../../../${p}`, import.meta.url));
@@ -29,7 +30,10 @@ if (wanted) {
 }
 
 const dryRun = values['dry-run'] || values['ai-dry'];
-const results = await run({ settings, sources, db: dryRun ? null : createDb(), ai: !values['no-ai'] });
+const results = await run({ settings, sources, db: dryRun ? null : createDb(), ai: !values['no-ai'] }).catch((err) => {
+  console.error(`Błąd: ${errorMessage(err)}`);
+  process.exit(1);
+});
 
 if (dryRun) {
   const top = results.slice(0, Number(values.top));
