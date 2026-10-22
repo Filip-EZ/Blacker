@@ -3,6 +3,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { and, desc, eq, gte, inArray, isNull, ne, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Settings } from './config';
+import { envValue } from './env';
 import type { Db } from './db';
 import { deals, products, shops } from './db/schema';
 
@@ -90,7 +91,7 @@ Bierz pod uwagę wiedzę o typowych cenach produktów, ale nie zmyślaj konkretn
 Zwróć recenzję dla każdego id z wejścia.`;
 
 export function createAiClient() {
-  return new Anthropic();
+  return new Anthropic({ apiKey: envValue('ANTHROPIC_API_KEY') });
 }
 
 /** Reviews one batch. Returns verdicts keyed by deal id; ids the model skipped are simply missing. */

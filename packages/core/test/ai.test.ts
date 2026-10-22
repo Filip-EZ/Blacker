@@ -24,3 +24,14 @@ describe('parseReviews', () => {
     expect(parseReviews('nie json')).toEqual([]);
   });
 });
+
+describe('envValue', () => {
+  it('obcina cudzysłowy i spacje wokół wartości', async () => {
+    const { envValue } = await import('../src/env');
+    process.env.BLACKER_TEST = '  "postgresql://u:p@host/db?sslmode=require"\n';
+    expect(envValue('BLACKER_TEST')).toBe('postgresql://u:p@host/db?sslmode=require');
+    process.env.BLACKER_TEST = "''";
+    expect(envValue('BLACKER_TEST')).toBeUndefined();
+    delete process.env.BLACKER_TEST;
+  });
+});
