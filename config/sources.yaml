@@ -1,0 +1,65 @@
+# Źródła promocji dla Blackera.
+# adapter: pepper | xkom-hotshot | jsonld | shopify | woocommerce
+# tier:    aggregator | big | small   (filtr na dashboardzie)
+# Nowy mały sklep na Shopify/WooCommerce = jeden wpis z url sklepu.
+
+settings:
+  # Minimalny wynik (0-100), żeby oferta trafiła do tabeli deali.
+  minScoreToStore: 35
+  # Od tego wyniku deal idzie do oceny AI.
+  aiThreshold: 60
+  # Bezpiecznik kosztów: maks. ocen AI na dobę.
+  aiDailyLimit: 300
+  aiBatchSize: 20
+  # Odstęp między zapytaniami do tej samej domeny.
+  requestDelayMs: 3000
+
+sources:
+  # --- Agregatory ---
+  - id: pepper-hot
+    name: Pepper.pl
+    adapter: pepper
+    tier: aggregator
+    urls:
+      - https://www.pepper.pl/rss/gor%C4%85ce
+      - https://www.pepper.pl/rss/wszystkie
+
+  # --- Duże sklepy ---
+  - id: xkom-hotshot
+    name: x-kom
+    adapter: xkom-hotshot
+    tier: big
+    url: https://www.x-kom.pl/goracy_strzal
+
+  # al.to zwraca 403 dla bota (sprawdzone 20.10.2026), dlatego jest wyłączony.
+  - id: alto-hotshot
+    name: al.to
+    adapter: xkom-hotshot
+    tier: big
+    enabled: false
+    url: https://www.al.to/goracy_strzal
+
+  # Media Expert zwraca 403 dla botów (sprawdzone 20.10.2026), więc go pomijamy;
+  # jego oferty i tak trafiają na Pepper.
+
+  # --- Mniejsze sklepy (przykłady do uzupełnienia) ---
+  # - id: moj-sklep-shopify
+  #   name: Mój Sklep
+  #   adapter: shopify
+  #   tier: small
+  #   url: https://moj-sklep.pl
+  #   category: Gaming
+  #   limit: 250
+  #
+  # - id: sklep-woo
+  #   name: Sklep Woo
+  #   adapter: woocommerce
+  #   tier: small
+  #   url: https://sklep-woo.pl
+  #
+  # - id: sklep-jsonld
+  #   name: Sklep na Shoperze
+  #   adapter: jsonld
+  #   tier: small
+  #   urls:
+  #     - https://sklep.pl/produkt/123

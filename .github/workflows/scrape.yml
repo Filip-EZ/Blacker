@@ -1,0 +1,41 @@
+name: scrape
+
+on:
+  schedule:
+    # Teraz: co godzinę (zbieranie historii cen przed Black Week).
+    # Na Black Week (23-30.11) zmień na: '*/15 * * * *'
+    - cron: '7 * * * *'
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Tylko te źródła (id po przecinku, puste = wszystkie)'
+        required: false
+      no_ai:
+        description: 'Pomiń ocenę AI'
+        type: boolean
+        default: false
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Scrape
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: >
+          pnpm scrape
+          ${{ inputs.source && format('--source={0}', inputs.source) || '' }}
+          ${{ inputs.no_ai && '--no-ai' || '' }}

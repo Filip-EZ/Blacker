@@ -1,0 +1,12 @@
+{
+  "name": "blacker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "pnpm --filter @blacker/core scrape",
+    "test": "pnpm --filter @blacker/core test",
+    "db:push": "pnpm --filter @blacker/core db:push",
+    "dev": "pnpm --filter @blacker/web dev"
+  },
+  "packageManager": "pnpm@12.6.0"
+}
