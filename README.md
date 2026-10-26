@@ -20,6 +20,16 @@ pnpm scrape --ai-dry                        # jak dry-run + ocena AI 3 najlepszy
 2. `pnpm db:push` tworzy tabele.
 3. `pnpm scrape` zapisuje ceny i deale, a potem odpala ocenę AI (`--no-ai`, żeby ją pominąć).
 
+## Dashboard (`apps/web`, Vercel)
+
+Next.js czyta tę samą bazę co scraper: lista okazji z filtrami (widok LIVE z ostatnich 2 h odświeża się co minutę),
+karta produktu z historią ceny i strona **Źródła** ze stanem adapterów.
+
+- Lokalnie: `pnpm dev` (bierze `DATABASE_URL` z `.env.local` w katalogu głównym), potem http://localhost:3000.
+- Na Vercelu: zaimportuj repo, ustaw **Root Directory** na `apps/web` i dodaj zmienne `DATABASE_URL`
+  oraz `DASHBOARD_PASSWORD` (hasło do strony; nazwa użytkownika dowolna). Bez `DASHBOARD_PASSWORD` strona jest otwarta.
+- `ENABLE_EXPERIMENTAL_COREPACK=1` każe Vercelowi użyć wersji pnpm z `packageManager`.
+
 ## Harmonogram (GitHub Actions)
 
 `.github/workflows/scrape.yml` uruchamia scraper co godzinę. W repo dodaj sekrety `DATABASE_URL` i `ANTHROPIC_API_KEY`.
